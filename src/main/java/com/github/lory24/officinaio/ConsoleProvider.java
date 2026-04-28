@@ -93,14 +93,16 @@ public class ConsoleProvider {
         this.registerCommand(new HelpCommand(), "help", "?");
     }
 
+    @SuppressWarnings("SameParameterValue")
     private void registerCommand(Command executor, String... aliases) {
         this.commands.add(new CommandWrapper(Arrays.stream(aliases).toList(), executor));
     }
 
     private void executeCommand(String command, String[] args) {
-        this.commands.stream().filter(commandWrapper -> commandWrapper.hasAlias(command)).findFirst().ifPresent(commandWrapper -> {
-            commandWrapper.executor().execute(this.officina, this.bufferedReader, args);
-        });
+        this.commands.stream()
+                .filter(commandWrapper -> commandWrapper.hasAlias(command))
+                .findFirst()
+                .ifPresent(commandWrapper -> commandWrapper.executor().execute(this.officina, this.bufferedReader, args));
     }
 
     @SneakyThrows
