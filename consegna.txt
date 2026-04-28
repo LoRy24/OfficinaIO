@@ -1,0 +1,24 @@
+OFFICINA che fa:
+- Revisioni
+- Riparazioni
+
+Agisce sui VEICOLI:
+- Macchina
+- Motociclo
+- Ciclomotore
+- Quadriciclo
+- Trattore Stradale
+- Autobus
+- Autosnodati
+- Macchine Operatrici
+- Macchine Agricole
+- Biciclette
+- Monopattini Elettrici
+
+Evento principale: PRENOTAZIONE delle Revisioni e Riparazioni 
+
+Prenotazione:
+- Data (Ora, Giorno, Mese, Anno Ecc.)
+- Indirizzo
+- Costo
+- Attività: Riparazione, Revisione
