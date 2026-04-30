@@ -14,6 +14,8 @@ public class HelpCommand implements Command {
         System.out.println();
         System.out.println("    Comando                        Descrizione");
         System.out.println("    - help | ?                     Mostra la lista dei comandi di OfficinaIO");
+        System.out.println("    - prenotazioni                 Gestisci le prenotazioni del servizio (apre la");
+        System.out.println("                                   sotto-categoria delle prenotazioni)");
         System.out.println();
     }
 }

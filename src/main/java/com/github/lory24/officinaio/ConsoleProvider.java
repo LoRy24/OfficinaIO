@@ -3,6 +3,7 @@ package com.github.lory24.officinaio;
 import com.github.lory24.officinaio.commands.Command;
 import com.github.lory24.officinaio.commands.CommandWrapper;
 import com.github.lory24.officinaio.commands.impl.HelpCommand;
+import com.github.lory24.officinaio.commands.impl.PrenotazioniCommand;
 import com.github.lory24.officinaio.core.Officina;
 import com.github.lory24.officinaio.utils.PrintingUtils;
 import lombok.NonNull;
@@ -99,6 +100,7 @@ public class ConsoleProvider {
 
     private void registerCommands() {
         this.registerCommand(new HelpCommand(), "help", "?");
+        this.registerCommand(new PrenotazioniCommand(), "prenotazioni");
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -132,6 +134,14 @@ public class ConsoleProvider {
         System.out.flush();
     }
 
+    public void printInputLine() {
+        this.printInputLine("");
+    }
+
+    public void printInputLine(String section) {
+        System.out.print("[Admin] " + username + " (" + section + ")~# ");
+    }
+
     @SneakyThrows
     private void loop() {
         // Crea il necessario per l'esecuzione della console
@@ -140,7 +150,7 @@ public class ConsoleProvider {
         // Fino a quando non viene eseguito il comando esci
         while (true) {
             // Chiedi l'input
-            System.out.print("[Admin] " + username + " ~# ");
+            this.printInputLine();
             input = this.readLine();
 
             // Logout
