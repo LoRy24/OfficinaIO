@@ -1,14 +1,13 @@
 package com.github.lory24.officinaio.commands.impl;
 
+import com.github.lory24.officinaio.ConsoleProvider;
 import com.github.lory24.officinaio.commands.Command;
 import com.github.lory24.officinaio.core.Officina;
-
-import java.io.BufferedReader;
 
 public class HelpCommand implements Command {
 
     @Override
-    public void execute(Officina officina, BufferedReader input, String[] args) {
+    public void execute(Officina officina, ConsoleProvider provider, String[] args) {
         System.out.println();
         System.out.println("Lista dei comandi utili di OfficinaIO, con i quali potrai gestire al meglio");
         System.out.println("questa officina");

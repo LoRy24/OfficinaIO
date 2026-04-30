@@ -5,6 +5,7 @@ import com.github.lory24.officinaio.commands.CommandWrapper;
 import com.github.lory24.officinaio.commands.impl.HelpCommand;
 import com.github.lory24.officinaio.core.Officina;
 import com.github.lory24.officinaio.utils.PrintingUtils;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
@@ -35,17 +36,24 @@ public class ConsoleProvider {
 
     /* Registri */
     private final List<CommandWrapper> commands = new ArrayList<>();
+    private boolean shouldClose = false;
 
     public void launchConsole() {
-        // Autentica
-        this.authenticate();
+        do {
+            // Pulisci lo schermo
+            this.clearScreen();
 
-        // Se autenticato, continua
-        if (!logged) return;
+            // Autentica
+            this.authenticate();
 
-        // Prepara e avvia la console
-        this.registerCommands();
-        this.loop();
+            // Se autenticato, continua
+            if (!logged) return;
+
+            // Prepara e avvia la console
+            this.registerCommands();
+            this.loop();
+        }
+        while (!this.shouldClose);
     }
 
     @SneakyThrows
@@ -57,7 +65,7 @@ public class ConsoleProvider {
         // Chiedi nickname
         while (input.isBlank()) {
             System.out.print("Inserisci il tuo username -> ");
-            input = bufferedReader.readLine();
+            input = this.readLine();
         }
 
         // Carica l'username
@@ -67,7 +75,7 @@ public class ConsoleProvider {
         System.out.print("Ciao " + this.username + "! ");
         while (!input.equals(securityCode)) {
             System.out.print("Inserisci il codice di sicurezza -> ");
-            input = bufferedReader.readLine();
+            input = this.readLine();
 
             // Codice non valido
             if (!input.equals(securityCode) && !input.isBlank()) {
@@ -98,11 +106,30 @@ public class ConsoleProvider {
         this.commands.add(new CommandWrapper(Arrays.stream(aliases).toList(), executor));
     }
 
-    private void executeCommand(String command, String[] args) {
+    private void executeCommand(@NonNull String command, String[] args) {
+        // Controlla se la stringa è vuota
+        if (command.trim().isBlank()) return;
+
+        // Se non è vuota prova a eseguire
         this.commands.stream()
-                .filter(commandWrapper -> commandWrapper.hasAlias(command))
+                .filter(commandWrapper -> commandWrapper.hasAlias(command.trim()))
                 .findFirst()
-                .ifPresent(commandWrapper -> commandWrapper.executor().execute(this.officina, this.bufferedReader, args));
+                .ifPresentOrElse(
+                        commandWrapper -> commandWrapper.executor().execute(this.officina, this, args),
+                        () -> {
+                            System.out.println("Comando sconosciuto! Digita 'help' o '?' per una lista dei comandi.");
+                        }
+                );
+    }
+
+    @SneakyThrows
+    public String readLine() {
+        return this.bufferedReader.readLine();
+    }
+
+    public void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
     }
 
     @SneakyThrows
@@ -114,17 +141,30 @@ public class ConsoleProvider {
         while (true) {
             // Chiedi l'input
             System.out.print("[Admin] " + username + " ~# ");
-            input = bufferedReader.readLine();
+            input = this.readLine();
+
+            // Logout
+            if (input.equalsIgnoreCase("logout")) {
+                this.shouldClose = false;
+                this.logged = false;
+                this.username = "";
+                break;
+            }
 
             // Uscita
-            if (input.equalsIgnoreCase("exit"))
+            if (input.equalsIgnoreCase("exit")) {
+                this.shouldClose = true;
                 break;
+            }
 
-            // Esegui il comando
-            String[] tokens = input.split(" ");
-            String[] args = new String[tokens.length - 1];
-            System.arraycopy(tokens, 1, args, 0, tokens.length - 1);
-            this.executeCommand(tokens[0], args);
+            // Esegui il comando solo se la riga non è vuota
+            if (!input.trim().isBlank()) {
+                // Esegui il comando
+                String[] tokens = input.split(" ");
+                String[] args = new String[tokens.length - 1];
+                System.arraycopy(tokens, 1, args, 0, tokens.length - 1);
+                this.executeCommand(tokens[0], args);
+            }
         }
     }
 }
