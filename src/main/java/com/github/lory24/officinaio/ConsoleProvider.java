@@ -118,9 +118,7 @@ public class ConsoleProvider {
                 .findFirst()
                 .ifPresentOrElse(
                         commandWrapper -> commandWrapper.executor().execute(this.officina, this, args),
-                        () -> {
-                            System.out.println("Comando sconosciuto! Digita 'help' o '?' per una lista dei comandi.");
-                        }
+                        () -> System.out.println("Comando sconosciuto! Digita 'help' o '?' per una lista dei comandi.")
                 );
     }
 
