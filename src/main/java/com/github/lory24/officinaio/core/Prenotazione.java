@@ -10,12 +10,14 @@ import java.util.List;
 
 @Getter
 public class Prenotazione {
+    private final int ID;
     private final String nome;
     private final String cognome;
     private final Date data;
     private final List<Servizio> servizi = new ArrayList<>();
 
-    public Prenotazione(String nome, String cognome, Date data, Servizio... servizi) {
+    public Prenotazione(int id, String nome, String cognome, Date data, Servizio... servizi) {
+        ID = id;
         this.nome = nome;
         this.cognome = cognome;
         this.data = data;
@@ -45,6 +47,10 @@ public class Prenotazione {
     }
 
     public boolean scaduta() {
-        return this.data.getTime() < System.currentTimeMillis();
+        return this.dateToMillis() < System.currentTimeMillis();
+    }
+
+    public long dateToMillis() {
+        return this.data.getTime();
     }
 }
