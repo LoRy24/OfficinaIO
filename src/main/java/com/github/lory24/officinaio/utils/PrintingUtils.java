@@ -15,7 +15,7 @@ public class PrintingUtils {
     public void printWelcomeMessage(@NonNull Officina officina) {
         System.out.println();
         System.out.println("Benvenuto in OfficinaIO, il sistema gestionale dell'officina di " + officina.getTitolare() + ".");
-        System.out.println("Per una lista dei comandi utili, digita 'help' o '?'.");
+        System.out.println("Per una lista dei comandi utili, digita 'aiuto' o '?'.");
         System.out.println();
     }
 
