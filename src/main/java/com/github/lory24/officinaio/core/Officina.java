@@ -3,10 +3,15 @@ package com.github.lory24.officinaio.core;
 import com.github.lory24.officinaio.ConsoleProvider;
 import com.github.lory24.officinaio.utils.PrintingUtils;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Getter
@@ -20,6 +25,7 @@ public class Officina {
 
     /* Registri Officina */
     private final List<Prenotazione> prenotazioni = new ArrayList<>();
+    private int currentCount = 0;
 
     public void apriOfficina() {
         // Intestazione
@@ -49,5 +55,30 @@ public class Officina {
         });
 
         thread.setName("updater-prenotazioni");
+    }
+
+    public List<Prenotazione> filtraPrenotazioni(int giorno, int mese, int anno) {
+        return prenotazioni.stream()
+                .filter(p -> matchData(p, giorno, mese, anno))
+                .collect(Collectors.toList());
+    }
+
+    private boolean matchData(@NonNull Prenotazione p, int giorno, int mese, int anno) {
+        LocalDate data = Instant.ofEpochMilli(p.getData().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+
+        if (giorno != -1 && data.getDayOfMonth() != giorno) {
+            return false;
+        }
+
+        if (mese != -1 && data.getMonthValue() != mese) {
+            return false;
+        }
+
+        return anno == -1 || data.getYear() == anno;
+    }
+
+    public void addPrenotazione(Prenotazione prenotazione) {
+        this.prenotazioni.add(prenotazione);
+        this.currentCount++;
     }
 }
