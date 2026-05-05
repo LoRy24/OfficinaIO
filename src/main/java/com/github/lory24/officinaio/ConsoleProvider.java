@@ -99,7 +99,7 @@ public class ConsoleProvider {
     }
 
     private void registerCommands() {
-        this.registerCommand(new HelpCommand(), "help", "?");
+        this.registerCommand(new HelpCommand(), "aiuto", "?");
         this.registerCommand(new PrenotazioniCommand(), "prenotazioni");
     }
 
@@ -160,7 +160,7 @@ public class ConsoleProvider {
             }
 
             // Uscita
-            if (input.equalsIgnoreCase("exit")) {
+            if (input.equalsIgnoreCase("esci")) {
                 this.shouldClose = true;
                 break;
             }
