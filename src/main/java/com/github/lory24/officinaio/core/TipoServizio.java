@@ -6,9 +6,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum TipoServizio {
-    RIPARAZIONE(100.0f),
-    REVISIONE(50.0f),
+    RIPARAZIONE(100.0f, "Riparazione"),
+    REVISIONE(50.0f, "Revisione"),
     ;
 
     private final double prezzoServizio;
+    private final String tipo;
 }
