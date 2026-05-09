@@ -1,6 +1,5 @@
 package com.github.lory24.officinaio.core;
 
-import com.github.lory24.officinaio.core.veicoli.Veicolo;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -24,16 +23,6 @@ public class Prenotazione {
         this.servizi.addAll(Arrays.asList(servizi));
     }
 
-    /* Aggiunta servizi */
-
-    public void aggiungiServizio(Servizio servizio) {
-        this.servizi.add(servizio);
-    }
-
-    public void aggiungiServizio(Veicolo veicolo, TipoServizio tipo, Servizio.Operazione... operazioni) {
-        this.aggiungiServizio(new Servizio(veicolo, tipo, operazioni));
-    }
-
     /* Calcoli */
 
     public double calcolaTotale() {
@@ -52,5 +41,33 @@ public class Prenotazione {
 
     public long dateToMillis() {
         return this.data.getTime();
+    }
+
+    public void stampaPrenotazione() {
+        System.out.println("--------------------------------------------------");
+        System.out.println();
+        System.out.println("ID: " + ID);
+        System.out.println("Nome: " + nome);
+        System.out.println("Cognome: " + cognome);
+        System.out.println("Data: " + data);
+        System.out.println();
+
+        // Stampa i servizi
+        int n = 1;
+        for (Servizio servizio: servizi) {
+            System.out.println("--------------------------------------------------");
+            System.out.println();
+            System.out.println("SERVIZIO N." + n);
+            System.out.println();
+            System.out.println(servizio);
+            System.out.println();
+        }
+
+        // Stampa il totale
+        System.out.println("--------------------------------------------------");
+        System.out.println();
+        System.out.println("TOTALE PRENOTAZIONE: " + this.calcolaTotale() + " Euro");
+        System.out.println();
+        System.out.println("--------------------------------------------------");
     }
 }

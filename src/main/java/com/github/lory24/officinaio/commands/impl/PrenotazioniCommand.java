@@ -66,7 +66,8 @@ public class PrenotazioniCommand implements Command {
 
                 // Comando per visualizzare in maniera approfondita
                 case "mostra": {
-
+                    this.mostraPrenotazione(officina, subCommandArgs);
+                    break;
                 }
 
                 // Comando vuoto
@@ -397,6 +398,7 @@ public class PrenotazioniCommand implements Command {
         // endregion Servizi
 
         // Invia resoconto
+        System.out.println();
         System.out.println("--------------------------------------------------");
         System.out.println("Resoconto Prenotazione: ");
         System.out.println("ID: " + newID);
@@ -419,7 +421,7 @@ public class PrenotazioniCommand implements Command {
             totale += servizio.calcolaCosto();
         }
 
-        System.out.println("TOTALE PRENOTAZIONE: " + totale);
+        System.out.println("TOTALE PRENOTAZIONE: " + totale + " Euro");
 
         System.out.println("--------------------------------------------------");
 
@@ -463,6 +465,30 @@ public class PrenotazioniCommand implements Command {
     }
 
     private void mostraPrenotazione(Officina officina, String[] args) {
+        // Controlla che abbia passato l'id
+        if (args.length == 0) {
+            System.out.println();
+            System.out.println("Devi inserire l'ID della prenotazione!");
+            System.out.println();
+            return;
+        }
 
+        // Controlla se è un numero
+        if (!NumberUtils.isNumber(args[0]) || Integer.parseInt(args[0]) < 0) {
+            System.out.println();
+            System.out.println("ID non valido!");
+            System.out.println();
+            return;
+        }
+
+        officina.getPrenotazioni().stream().filter(prenotazione -> prenotazione.getID() == Integer.parseInt(args[0])).findAny().ifPresentOrElse(prenotazione -> {
+            System.out.println();
+            prenotazione.stampaPrenotazione();
+            System.out.println();
+        }, () -> {
+            System.out.println();
+            System.out.println("Non esiste alcuna prenotazione con tale ID!");
+            System.out.println();
+        });
     }
 }
