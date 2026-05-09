@@ -74,6 +74,7 @@ public class ConsoleProvider {
 
         // Chiedi il codice di sicurezza
         System.out.print("Ciao " + this.username + "! ");
+        input = "";
         while (!input.equals(securityCode)) {
             System.out.print("Inserisci il codice di sicurezza -> ");
             input = this.readLine();
