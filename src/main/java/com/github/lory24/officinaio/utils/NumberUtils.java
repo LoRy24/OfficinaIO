@@ -7,7 +7,7 @@ public class NumberUtils {
 
     public boolean isNumber(String key) {
         try {
-            Integer.parseInt(key);
+            Double.parseDouble(key);
             return true;
         } catch (Exception ignored) {
             return false;
