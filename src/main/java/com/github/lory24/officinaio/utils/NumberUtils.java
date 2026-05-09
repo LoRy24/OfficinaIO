@@ -5,12 +5,12 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class NumberUtils {
 
-    public boolean isNumber(String key) {
+    public boolean isNotANumber(String key) {
         try {
             Double.parseDouble(key);
-            return true;
-        } catch (Exception ignored) {
             return false;
+        } catch (Exception ignored) {
+            return true;
         }
     }
 }

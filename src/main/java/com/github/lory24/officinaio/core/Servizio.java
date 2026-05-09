@@ -2,6 +2,7 @@ package com.github.lory24.officinaio.core;
 
 import com.github.lory24.officinaio.core.veicoli.Veicolo;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +31,7 @@ public class Servizio {
     // Tipo per le operazioni
     public record Operazione(String descrizione, double prezzo) {
         @Override
-        public String toString() {
+        public @NotNull String toString() {
             return descrizione + " -> " + prezzo;
         }
     }

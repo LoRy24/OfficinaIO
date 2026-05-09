@@ -268,7 +268,7 @@ public class PrenotazioniCommand implements Command {
                 System.out.print("Inserisci il tipo del veicolo: ");
                 tipoInput = provider.readLine();
 
-                if (!NumberUtils.isNumber(tipoInput)) {
+                if (NumberUtils.isNotANumber(tipoInput)) {
                     System.out.println("Hai inserito un valore non valido! Riprova");
                     tipo = -1;
                 }
@@ -327,7 +327,7 @@ public class PrenotazioniCommand implements Command {
                 System.out.print("Inserisci il tipo del servizio: ");
                 tipoServizioInput = provider.readLine();
 
-                if (!NumberUtils.isNumber(tipoServizioInput)) {
+                if (NumberUtils.isNotANumber(tipoServizioInput)) {
                     System.out.println("Hai inserito un valore non valido! Riprova");
                     tipoServizio = -1;
                 }
@@ -355,14 +355,14 @@ public class PrenotazioniCommand implements Command {
                 do {
                     prezzoOperazioneInput = provider.readLine();
 
-                    if (!NumberUtils.isNumber(prezzoOperazioneInput)) {
+                    if (NumberUtils.isNotANumber(prezzoOperazioneInput)) {
                         System.out.println("Hai inserito un valore non valido! Riprova");
                         prezzoOperazione = -1;
                         continue;
                     }
 
                     prezzoOperazione = Double.parseDouble(prezzoOperazioneInput);
-                } while (!NumberUtils.isNumber(prezzoOperazioneInput) || prezzoOperazione <= 0);
+                } while (NumberUtils.isNotANumber(prezzoOperazioneInput) || prezzoOperazione <= 0);
 
                 // Aggiungi l'operazione
                 operazioni.add(new Servizio.Operazione(descrizioneOperazione, prezzoOperazione));
@@ -474,7 +474,7 @@ public class PrenotazioniCommand implements Command {
         }
 
         // Controlla se è un numero
-        if (!NumberUtils.isNumber(args[0]) || Integer.parseInt(args[0]) < 0) {
+        if (NumberUtils.isNotANumber(args[0]) || Integer.parseInt(args[0]) < 0) {
             System.out.println();
             System.out.println("ID non valido!");
             System.out.println();

@@ -16,6 +16,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok:1.18.46")
     annotationProcessor("org.projectlombok:lombok:1.18.46")
+    compileOnly("org.jetbrains:annotations:26.1.0")
 }
 
 tasks.test {
