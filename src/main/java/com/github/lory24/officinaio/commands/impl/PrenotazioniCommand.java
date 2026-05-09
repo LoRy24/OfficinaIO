@@ -5,7 +5,10 @@ import com.github.lory24.officinaio.commands.Command;
 import com.github.lory24.officinaio.core.Officina;
 import com.github.lory24.officinaio.core.Prenotazione;
 import com.github.lory24.officinaio.core.Servizio;
+import com.github.lory24.officinaio.core.TipoServizio;
+import com.github.lory24.officinaio.core.veicoli.*;
 import com.github.lory24.officinaio.utils.DateUtils;
+import com.github.lory24.officinaio.utils.NumberUtils;
 import lombok.NonNull;
 
 import java.util.ArrayList;
@@ -46,13 +49,13 @@ public class PrenotazioniCommand implements Command {
 
                 // Comando per visualizzare le prenotazioni
                 case "lista": {
-                    printFilteredList(officina, subCommandArgs);
+                    this.printFilteredList(officina, subCommandArgs);
                     break;
                 }
 
                 // Comando per creare una prenotazione
                 case "crea": {
-                    creaPrenotazione(officina, provider);
+                    this.creaPrenotazione(officina, provider);
                     break;
                 }
 
@@ -97,7 +100,7 @@ public class PrenotazioniCommand implements Command {
         System.out.println();
     }
 
-    private void printFilteredList(Officina officina, String[] args) {
+    private void printFilteredList(Officina officina, String @NonNull [] args) {
         // Definisci i filtri
         boolean dayFilter = false, monthFilter = false, yearFilter = false;
         int dayFilterV = -1, monthFilterV = -1, yearFilterV = -1;
@@ -168,7 +171,7 @@ public class PrenotazioniCommand implements Command {
         this.printList(lista);
     }
 
-    private void printList(List<Prenotazione> prenotazioni) {
+    private void printList(@NonNull List<Prenotazione> prenotazioni) {
         if (prenotazioni.isEmpty()) {
             System.out.println("\nNon ci sono prenotazioni da mostrare.");
             System.out.println("Se pensi si tratti di un errore, controlla i filtri e riprova.\n");
@@ -176,19 +179,18 @@ public class PrenotazioniCommand implements Command {
         }
 
         // Header con ID
-        System.out.printf("\n%-5s %-15s %-15s %-12s %-10s%n", "ID", "Nome", "Cognome", "Data", "Totale");
-        System.out.println("-----------------------------------------------------------------------");
+        System.out.printf("\n%-5s %-15s %-15s %-12s %-16s%n", "ID", "Nome", "Cognome", "Data", "Totale");
+        System.out.println("-----------------------------------------------------------------------------");
 
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
 
-        int id = 1;
         for (Prenotazione p : prenotazioni) {
             String dataStr = sdf.format(p.getData());
             double totale = p.calcolaTotale();
 
             System.out.printf(
-                    "%-5d %-15s %-15s %-12s %-10.2f%n",
-                    id++,
+                    "%-5d %-15s %-15s %-12s %-16.2f%n",
+                    p.getID(),
                     p.getNome(),
                     p.getCognome(),
                     dataStr,
@@ -196,10 +198,10 @@ public class PrenotazioniCommand implements Command {
             );
         }
 
-        System.out.println("-----------------------------------------------------------------------\n");
+        System.out.println("-----------------------------------------------------------------------------\n");
     }
 
-    private void creaPrenotazione(Officina officina, ConsoleProvider provider) {
+    private void creaPrenotazione(@NonNull Officina officina, ConsoleProvider provider) {
         // Welcome
         System.out.println("\nCREAZIONE NUOVA PRENOTAZIONE\n");
 
@@ -241,7 +243,144 @@ public class PrenotazioniCommand implements Command {
         System.out.println("\nINSERIMENTO DEI SERVIZI\n");
         String continueInput;
         do {
-            // TODO Inserimento servizio
+            // Inserimento del Veicolo
+            String targa, proprietario;
+            int tipo;
+
+            // Info base
+            System.out.print("Inserisci il nome e il cognome del proprietario del veicolo: ");
+            proprietario = provider.readLine();
+
+            System.out.print("Inserisci la targa del veicolo: ");
+            targa = provider.readLine();
+
+            // Scegli il tipo di veicolo
+
+            System.out.println("\nTipi di veicoli ammessi:");
+            System.out.println("1 - Autovettura");
+            System.out.println("2 - Ciclomotore");
+            System.out.println("3 - Motociclo");
+            System.out.println("4 - Autocarro\n");
+
+            String tipoInput;
+            do {
+                System.out.print("Inserisci il tipo del veicolo: ");
+                tipoInput = provider.readLine();
+
+                if (!NumberUtils.isNumber(tipoInput)) {
+                    System.out.println("Hai inserito un valore non valido! Riprova");
+                    tipo = -1;
+                }
+                else {
+                    tipo = Integer.parseInt(tipoInput);
+                }
+            }
+            while (tipo <= 0 || tipo > 4);
+
+            // Crea il veicolo in base al tipo
+            Veicolo veicolo;
+            switch (tipo) {
+                case 1: {
+                    veicolo = new Autovettura(targa, proprietario);
+                    break;
+                }
+
+                case 2: {
+                    veicolo = new Ciclomotore(targa, proprietario);
+                    break;
+                }
+
+                case 3: {
+                    veicolo = new Motociclo(targa, proprietario);
+                    break;
+                }
+
+                case 4: {
+                    veicolo = new Autocarro(targa, proprietario);
+                    break;
+                }
+
+                default: {
+                    veicolo = new Veicolo(targa, proprietario, TipoVeicolo.NESSUNO) {
+                        @Override
+                        public void promptSpecificInfo(ConsoleProvider provider) {
+
+                        }
+                    };
+                    break;
+                }
+            }
+
+            // Immissione dei dati specifici per il veicolo
+            veicolo.promptSpecificInfo(provider);
+
+            // Chiedi il tipo di servizio
+
+            System.out.println("\nTipi di servizio: ");
+            System.out.println("1 - Riparazione");
+            System.out.println("2 - Revisione\n");
+
+            String tipoServizioInput;
+            int tipoServizio;
+            do {
+                System.out.print("Inserisci il tipo del servizio: ");
+                tipoServizioInput = provider.readLine();
+
+                if (!NumberUtils.isNumber(tipoServizioInput)) {
+                    System.out.println("Hai inserito un valore non valido! Riprova");
+                    tipoServizio = -1;
+                }
+                else {
+                    tipoServizio = Integer.parseInt(tipoServizioInput);
+                    if (tipoServizio <= 0 || tipoServizio > 2)
+                        System.out.println("Hai inserito un valore non valido! Riprova");
+                }
+            }
+            while (tipoServizio <= 0 || tipoServizio > 2);
+
+            // Immissione della lista delle operazioni
+            String descrizioneOperazione, prezzoOperazioneInput;
+            double prezzoOperazione;
+            int operazione = 1;
+            List<Servizio.Operazione> operazioni = new ArrayList<>();
+
+            do {
+                System.out.println("\nOperazione #" + operazione);
+
+                System.out.print("Inserisci la descrizione: ");
+                descrizioneOperazione = provider.readLine();
+
+                System.out.print("Inserisci la prezzo: ");
+                do {
+                    prezzoOperazioneInput = provider.readLine();
+
+                    if (!NumberUtils.isNumber(prezzoOperazioneInput)) {
+                        System.out.println("Hai inserito un valore non valido! Riprova");
+                        prezzoOperazione = -1;
+                        continue;
+                    }
+
+                    prezzoOperazione = Double.parseDouble(prezzoOperazioneInput);
+                } while (!NumberUtils.isNumber(prezzoOperazioneInput) || prezzoOperazione <= 0);
+
+                // Aggiungi l'operazione
+                operazioni.add(new Servizio.Operazione(descrizioneOperazione, prezzoOperazione));
+                operazione++;
+
+                System.out.print("Vuoi inserire un'altra operazione? (N, s): ");
+                String continua;
+                do {
+                    continua = provider.readLine();
+                } while (!continua.equalsIgnoreCase("s") && !continua.equalsIgnoreCase("n") && !continua.isBlank());
+
+                if (continua.equalsIgnoreCase("n") || continua.isBlank())
+                    break;
+            } while (true);
+
+            // salva il servizio
+            Servizio.Operazione[] operazioniArray = new Servizio.Operazione[operazioni.size()];
+            operazioni.toArray(operazioniArray);
+            servizi.add(new Servizio(veicolo, TipoServizio.values()[tipoServizio - 1], operazioniArray));
 
             // Chiedi se si vuole continuare
             do {
@@ -257,7 +396,32 @@ public class PrenotazioniCommand implements Command {
 
         // endregion Servizi
 
-        // TODO Manda resoconto
+        // Invia resoconto
+        System.out.println("--------------------------------------------------");
+        System.out.println("Resoconto Prenotazione: ");
+        System.out.println("ID: " + newID);
+        System.out.println("Cliente: " + nome + " " + cognome);
+        System.out.println("Data: " + data);
+        System.out.println("--------------------------------------------------");
+        System.out.println("Servizi: ");
+
+        int i = 1;
+        for (Servizio servizio : servizi) {
+            System.out.println("\n* SERVIZIO N." + i + " *\n");
+            System.out.println(servizio.toString());
+            i++;
+        }
+
+        System.out.println("--------------------------------------------------");
+
+        double totale = 0;
+        for (Servizio servizio : servizi) {
+            totale += servizio.calcolaCosto();
+        }
+
+        System.out.println("TOTALE PRENOTAZIONE: " + totale);
+
+        System.out.println("--------------------------------------------------");
 
         // region Conferma
 
@@ -276,7 +440,17 @@ public class PrenotazioniCommand implements Command {
 
         // Se conferma la creazione, crea
         if (confirmInput.equals("s")) {
-            // TODO Salva in memoria la prenotazione
+            // salva in memoria la prenotazione
+            Servizio[] serviziArray =  new Servizio[servizi.size()];
+            servizi.toArray(serviziArray);
+
+            officina.addPrenotazione(new Prenotazione(
+                    newID,
+                    nome,
+                    cognome,
+                    parsedDate,
+                    serviziArray
+            ));
 
             // Conferma
             System.out.println("\nCreazione CONFERMATA!\n");
@@ -286,5 +460,9 @@ public class PrenotazioniCommand implements Command {
         }
 
         // endregion Conferma
+    }
+
+    private void mostraPrenotazione(Officina officina, String[] args) {
+
     }
 }
