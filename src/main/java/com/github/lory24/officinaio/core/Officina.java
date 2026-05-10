@@ -81,4 +81,8 @@ public class Officina {
         this.prenotazioni.add(prenotazione);
         this.currentCount++;
     }
+
+    public void rimuoviPrenotazione(int id) {
+        this.prenotazioni.removeIf(prenotazione -> prenotazione.getID() == id);
+    }
 }

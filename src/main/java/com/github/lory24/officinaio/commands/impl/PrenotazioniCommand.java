@@ -10,6 +10,7 @@ import com.github.lory24.officinaio.core.veicoli.*;
 import com.github.lory24.officinaio.utils.DateUtils;
 import com.github.lory24.officinaio.utils.NumberUtils;
 import lombok.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,13 +61,30 @@ public class PrenotazioniCommand implements Command {
                 }
 
                 // Comando per eliminare
-                case "elimina": {
-
-                }
-
+                case "elimina":
                 // Comando per visualizzare in maniera approfondita
                 case "mostra": {
-                    this.mostraPrenotazione(officina, subCommandArgs);
+                    // Controlla che abbia passato l'id
+                    if (subCommandArgs.length == 0) {
+                        System.out.println();
+                        System.out.println("Devi inserire l'id della prenotazione!");
+                        System.out.println();
+                        return;
+                    }
+
+                    // Controlla se è un numero
+                    if (NumberUtils.isNotANumber(subCommandArgs[0]) || Integer.parseInt(subCommandArgs[0]) < 0) {
+                        System.out.println();
+                        System.out.println("ID non valido!");
+                        System.out.println();
+                        return;
+                    }
+
+                    switch (subCommand) {
+                        case "elimina" -> eliminaPrenotazione(officina, subCommandArgs);
+                        case "mostra" -> mostraPrenotazione(officina, subCommandArgs);
+                    }
+
                     break;
                 }
 
@@ -464,26 +482,24 @@ public class PrenotazioniCommand implements Command {
         // endregion Conferma
     }
 
-    private void mostraPrenotazione(Officina officina, String[] args) {
-        // Controlla che abbia passato l'id
-        if (args.length == 0) {
-            System.out.println();
-            System.out.println("Devi inserire l'ID della prenotazione!");
-            System.out.println();
-            return;
-        }
-
-        // Controlla se è un numero
-        if (NumberUtils.isNotANumber(args[0]) || Integer.parseInt(args[0]) < 0) {
-            System.out.println();
-            System.out.println("ID non valido!");
-            System.out.println();
-            return;
-        }
-
+    private void mostraPrenotazione(@NotNull Officina officina, String[] args) {
         officina.getPrenotazioni().stream().filter(prenotazione -> prenotazione.getID() == Integer.parseInt(args[0])).findAny().ifPresentOrElse(prenotazione -> {
             System.out.println();
             prenotazione.stampaPrenotazione();
+            System.out.println();
+        }, () -> {
+            System.out.println();
+            System.out.println("Non esiste alcuna prenotazione con tale ID!");
+            System.out.println();
+        });
+    }
+
+    private void eliminaPrenotazione(@NotNull Officina officina, String[] args) {
+        officina.getPrenotazioni().stream().filter(prenotazione -> prenotazione.getID() == Integer.parseInt(args[0])).findAny().ifPresentOrElse(_ -> {
+            officina.rimuoviPrenotazione(Integer.parseInt(args[0]));
+
+            System.out.println();
+            System.out.println("Prenotazione eliminata!");
             System.out.println();
         }, () -> {
             System.out.println();
