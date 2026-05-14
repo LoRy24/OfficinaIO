@@ -1,6 +1,7 @@
 package com.github.lory24.officinaio.core;
 
 import com.github.lory24.officinaio.ConsoleProvider;
+import com.github.lory24.officinaio.ProviderFatture;
 import com.github.lory24.officinaio.utils.PrintingUtils;
 import lombok.Getter;
 import lombok.NonNull;
@@ -19,9 +20,14 @@ public class Officina {
     /* Dettagli Officina */
     private final String indirizzo;
     private final String titolare;
+    private final String pIva;
+    private final String nome;
 
     /* Provider della console */
     private ConsoleProvider consoleProvider;
+
+    /* Provider per le fatture */
+    private ProviderFatture providerFatture;
 
     /* Registri Officina */
     private final List<Prenotazione> prenotazioni = new ArrayList<>();
@@ -33,6 +39,10 @@ public class Officina {
 
         // Logiche
         this.avviaGestorePrenotazioni();
+
+        // Carica il provider per le fatture
+        this.providerFatture = new ProviderFatture();
+        this.providerFatture.load();
 
         // Ciclo della console
         this.consoleProvider = new ConsoleProvider(this);

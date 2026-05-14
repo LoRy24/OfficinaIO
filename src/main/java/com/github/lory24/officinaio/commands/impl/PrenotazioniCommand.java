@@ -2,17 +2,16 @@ package com.github.lory24.officinaio.commands.impl;
 
 import com.github.lory24.officinaio.ConsoleProvider;
 import com.github.lory24.officinaio.commands.Command;
-import com.github.lory24.officinaio.core.Officina;
-import com.github.lory24.officinaio.core.Prenotazione;
-import com.github.lory24.officinaio.core.Servizio;
-import com.github.lory24.officinaio.core.TipoServizio;
+import com.github.lory24.officinaio.core.*;
 import com.github.lory24.officinaio.core.veicoli.*;
 import com.github.lory24.officinaio.utils.DateUtils;
 import com.github.lory24.officinaio.utils.NumberUtils;
 import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -62,6 +61,8 @@ public class PrenotazioniCommand implements Command {
 
                 // Comando per eliminare
                 case "elimina":
+                // Comando per creare la fattura
+                case "fattura":
                 // Comando per visualizzare in maniera approfondita
                 case "mostra": {
                     // Controlla che abbia passato l'id
@@ -81,8 +82,9 @@ public class PrenotazioniCommand implements Command {
                     }
 
                     switch (subCommand) {
-                        case "elimina" -> eliminaPrenotazione(officina, subCommandArgs);
-                        case "mostra" -> mostraPrenotazione(officina, subCommandArgs);
+                        case "elimina" -> this.eliminaPrenotazione(officina, subCommandArgs);
+                        case "mostra" -> this.mostraPrenotazione(officina, subCommandArgs);
+                        case "fattura" -> this.creaFattura(officina, provider, subCommandArgs);
                     }
 
                     break;
@@ -115,6 +117,7 @@ public class PrenotazioniCommand implements Command {
         System.out.println("    - elimina                      <id>                              Elimina una prenotazione in base al suo ID");
         System.out.println("    - mostra                       <id>                              Visualizza in maniera dettagliata una singola prenotazione");
         System.out.println("    - conferma                     nessuno                           Conferma le modifiche ed esci dal sotto-sistema");
+        System.out.println("    - fattura                      <id>                              Crea la fattura per la prenotazione inserita");
         System.out.println("                                                                     ");
         System.out.println();
     }
@@ -501,6 +504,51 @@ public class PrenotazioniCommand implements Command {
             System.out.println();
             System.out.println("Prenotazione eliminata!");
             System.out.println();
+        }, () -> {
+            System.out.println();
+            System.out.println("Non esiste alcuna prenotazione con tale ID!");
+            System.out.println();
+        });
+    }
+
+    private void creaFattura(@NotNull Officina officina, ConsoleProvider provider, String[] args) {
+        officina.getPrenotazioni().stream().filter(prenotazione -> prenotazione.getID() == Integer.parseInt(args[0])).findAny().ifPresentOrElse(prenotazione -> {
+            System.out.println();
+            System.out.println("Per creare la fattura, inserisci le informazioni mancanti");
+            System.out.println();
+
+            System.out.print("Inserisci la data di nascita: ");
+            String dataDiNascita = provider.readLine();
+
+            System.out.print("Inserisci il luogo di nascita: ");
+            String luogoDiNascita = provider.readLine();
+
+            System.out.print("Inserisci la residenza: ");
+            String residenza = provider.readLine();
+
+            System.out.print("Inserisci il codice fiscale: ");
+            String codiceFiscale = provider.readLine();
+
+            Fattura fattura = officina.getProviderFatture().creaFattura(
+                    prenotazione.getNome(),
+                    prenotazione.getCognome(),
+                    dataDiNascita,
+                    luogoDiNascita,
+                    residenza,
+                    codiceFiscale,
+                    officina,
+                    prenotazione
+            );
+
+            // Salva la fattura
+            officina.getProviderFatture().salvaFattura(fattura);
+
+            // File della fattura
+            File fileFattura = new File("./fatture/" + Calendar.getInstance().get(Calendar.YEAR) + "/fattura_" + fattura.getNumero() + ".txt");
+
+            // Scrivi il messaggi di successo
+            System.out.println("Fattura " + fattura.getNumero() + " creata con successo!");
+            System.out.println("Posizione: " + fileFattura.getAbsolutePath());
         }, () -> {
             System.out.println();
             System.out.println("Non esiste alcuna prenotazione con tale ID!");
